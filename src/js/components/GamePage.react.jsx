@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Board from './Board.react';
+import GameActions from '../actions/GameActions';
 
 class GamePage extends React.Component {
   static propTypes = {
@@ -8,6 +9,10 @@ class GamePage extends React.Component {
   }
 
   state = {};
+
+  componentDidMount() {
+    GameActions.connect(this.props.match.params.gameId);
+  }
 
   render() {
     return (
