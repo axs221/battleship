@@ -21,7 +21,6 @@ const config = {
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: 'bundle.[hash].js',
-    publicPath: 'http://localhost:3000/',
   },
 
   devtool: 'inline-source-map',
