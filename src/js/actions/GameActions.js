@@ -25,6 +25,13 @@ const GameActions = {
       text,
     });
   },
+  clickTile(row, column) {
+    AppDispatcher.dispatch({
+      actionType: GameConstants.CLICK_TILE,
+      row,
+      column,
+    });
+  },
 };
 
 export default GameActions;

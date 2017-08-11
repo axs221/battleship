@@ -26,13 +26,14 @@ class GamePage extends React.Component {
   }
 
   render() {
+    const gameState = GameStore.getGameState();
     return (
       <div>
-        <h1>Battleship</h1>
+        <h1>Battleship - {gameState.phase}</h1>
         <div className="row">
           <div className="col-md-6">
             <h3>You</h3>
-            <Board />
+            <Board phase={gameState.phase} me />
           </div>
           <div className="col-md-6">
             <h3>Enemy</h3>

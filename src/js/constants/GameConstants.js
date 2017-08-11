@@ -5,4 +5,5 @@ module.exports = keyMirror({
   JOIN_GAME: null,
   PLACE_SHIPS: null,
   SEND_MESSAGE: null,
+  CLICK_TILE: null,
 });

@@ -8,6 +8,18 @@ import NotificationConstants from '../constants/NotificationConstants';
 let peer = null;
 let peerId = null;
 let connection = null;
+const gameState = {
+  phase: 'setup',
+  me: {
+    setup: false,
+    ships: [],
+    attacks: [],
+  },
+  enemy: {
+    setup: false,
+    attacks: [],
+  },
+};
 
 class GameStore extends BaseStore {
   createGame() {
@@ -49,10 +61,22 @@ class GameStore extends BaseStore {
     });
   }
 
-  processMessage(message) {
-    if (message.type === 'chat') {
-      NotificationActions.showMessage('Chat', message.chat, NotificationConstants.INFO);
+  processMessage = (data) => {
+    if (data.type === 'chat') {
+      this.processChatMessage(data);
+    } else if (data.type === 'setup-finished') {
+      this.processGameState(data);
     }
+  }
+
+  processChatMessage(data) {
+    NotificationActions.showMessage('Chat', data.chat, NotificationConstants.INFO);
+  }
+
+  processSetupFinished(data) {
+    gameState.enemy.setup = true;
+    this.checkIfSetupComplete();
+    this.emitChange();
   }
 
   getPeerId() {
@@ -63,8 +87,41 @@ class GameStore extends BaseStore {
     return !!connection;
   }
 
+  placeShips(ships) {
+    gameState.me.ships = ships;
+    gameState.me.setup = true;
+    this.checkIfSetupComplete();
+  }
+
   sendMessage(text) {
     connection.send({ type: 'chat', chat: text });
+  }
+
+  getGameState() {
+    return gameState;
+  }
+
+  checkIfSetupComplete() {
+    if (gameState.me.setup && gameState.enemy.setup) {
+      gameState.phase = 'play';
+    }
+  }
+
+  clickTile(row, column) {
+    if (gameState.phase === 'setup') {
+      this.handleClickSetup(row, column);
+    } else {
+      this.handleClickPlay(row, column);
+    }
+  }
+
+  handleClickSetup(row, column) {
+    if (gameState.me.ships.length === 0) {
+      gameState.me.ships.push({ start: { row, column } });
+    } else {
+      gameState.me.ships[0].end = { row, column };
+    }
+    this.emitChange();
   }
 }
 
@@ -78,6 +135,12 @@ AppDispatcher.register((action) => {
       break;
     case GameConstants.JOIN_GAME:
       gameStoreInstance.joinGame(action.otherPeerId);
+      break;
+    case GameConstants.PLACE_SHIPS:
+      gameStoreInstance.placeShips(action.ships);
+      break;
+    case GameConstants.CLICK_TILE:
+      gameStoreInstance.clickTile(action.row, action.column);
       break;
     case GameConstants.SEND_MESSAGE:
       gameStoreInstance.sendMessage(action.text);
