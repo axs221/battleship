@@ -1,4 +1,3 @@
-/* @flow */
 import EventEmitter from 'events';
 
 const CHANGE_EVENT = 'change';
@@ -8,11 +7,11 @@ class BaseStore extends EventEmitter {
     this.emit(CHANGE_EVENT);
   }
 
-  addChangeListener(callback: any) {
+  addChangeListener(callback) {
     this.on(CHANGE_EVENT, callback);
   }
 
-  removeChangeListener(callback: any) {
+  removeChangeListener(callback) {
     this.removeListener(CHANGE_EVENT, callback);
   }
 }

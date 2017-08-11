@@ -6,7 +6,6 @@
     "stage-3"
   ],
   "plugins": [
-    "transform-flow-strip-types",
     "transform-class-properties",
     "transform-es2015-block-scoping",
     ["transform-es2015-classes", { loose: true }],

@@ -1,4 +1,3 @@
-/* @flow */
 import AppDispatcher from '../dispatcher/AppDispatcher';
 import NotificationConstants from '../constants/NotificationConstants';
 import BaseStore from './BaseStore';

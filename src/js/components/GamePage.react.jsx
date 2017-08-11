@@ -39,8 +39,10 @@ class GamePage extends React.Component {
             <Board />
           </div>
         </div>
-        <input type="text" value={this.state.chatMessage} onChange={e => this.setState({ chatMessage: e.target.value })} />
-        <button onClick={this.sendChat}>Send</button>
+        <form onSubmit={e => e.preventDefault}>
+          <input type="text" value={this.state.chatMessage} onChange={e => this.setState({ chatMessage: e.target.value })} />
+          <button onClick={this.sendChat} type="submit">Send Chat</button>
+        </form>
       </div>
     );
   }

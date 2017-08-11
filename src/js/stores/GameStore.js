@@ -1,4 +1,3 @@
-/* @flow */
 import Peer from 'peerjs';
 import BaseStore from './BaseStore';
 import AppDispatcher from '../dispatcher/AppDispatcher';
@@ -18,12 +17,10 @@ class GameStore extends BaseStore {
     // listen for when our peer opens
     peer.on('open', (id) => {
       peerId = id;
-      console.log('open', id);
       this.emitChange();
 
       // listen for when the peer connects to us
       peer.on('connection', (conn) => {
-        console.log('peer connected');
         connection = conn;
         this.emitChange();
 
@@ -33,20 +30,17 @@ class GameStore extends BaseStore {
     });
   }
 
-  joinGame(otherPeerId: string) {
+  joinGame(otherPeerId) {
     // create our peer
     peer = new Peer({ key: 'p279t1ibr0diy66r' });
 
     // listen for when our peer opens
     peer.on('open', (id) => {
       peerId = id;
-      console.log('open', id);
 
       // make a connection to the other player
-      console.log('connecting to ', otherPeerId);
       connection = peer.connect(otherPeerId);
       connection.on('open', () => {
-        console.log('peer connected');
         this.emitChange();
 
         // hook up our handler for messages
@@ -56,7 +50,7 @@ class GameStore extends BaseStore {
   }
 
   processMessage(message) {
-    if (message.chat) {
+    if (message.type === 'chat') {
       NotificationActions.showMessage('Chat', message.chat, NotificationConstants.INFO);
     }
   }
@@ -70,7 +64,7 @@ class GameStore extends BaseStore {
   }
 
   sendMessage(text) {
-    connection.send({ chat: text });
+    connection.send({ type: 'chat', chat: text });
   }
 }
 

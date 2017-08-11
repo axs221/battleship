@@ -1,4 +1,3 @@
-/* @flow */
 import BaseStore from './BaseStore';
 import AppDispatcher from '../dispatcher/AppDispatcher';
 import RouterConstants from '../constants/RouterConstants';
