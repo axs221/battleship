@@ -1,9 +1,12 @@
 import React from 'react';
 import Board from './Board.react';
 import GameStore from '../stores/GameStore';
+import GameActions from '../actions/GameActions';
 
 class GamePage extends React.Component {
-  state = {};
+  state = {
+    chatMessage: '',
+  };
 
   componentDidMount() {
     GameStore.addChangeListener(this.onChange);
@@ -15,6 +18,11 @@ class GamePage extends React.Component {
 
   onChange = () => {
     this.forceUpdate();
+  }
+
+  sendChat = () => {
+    GameActions.sendMessage(this.state.chatMessage);
+    this.setState({ chatMessage: '' });
   }
 
   render() {
@@ -31,6 +39,8 @@ class GamePage extends React.Component {
             <Board />
           </div>
         </div>
+        <input type="text" value={this.state.chatMessage} onChange={e => this.setState({ chatMessage: e.target.value })} />
+        <button onClick={this.sendChat}>Send</button>
       </div>
     );
   }

@@ -3,6 +3,8 @@ import Peer from 'peerjs';
 import BaseStore from './BaseStore';
 import AppDispatcher from '../dispatcher/AppDispatcher';
 import GameConstants from '../constants/GameConstants';
+import NotificationActions from '../actions/NotificationActions';
+import NotificationConstants from '../constants/NotificationConstants';
 
 let peer = null;
 let peerId = null;
@@ -24,6 +26,9 @@ class GameStore extends BaseStore {
         console.log('peer connected');
         connection = conn;
         this.emitChange();
+
+        // hook up our handler for messages
+        connection.on('data', this.processMessage);
       });
     });
   }
@@ -43,8 +48,17 @@ class GameStore extends BaseStore {
       connection.on('open', () => {
         console.log('peer connected');
         this.emitChange();
+
+        // hook up our handler for messages
+        connection.on('data', this.processMessage);
       });
     });
+  }
+
+  processMessage(message) {
+    if (message.chat) {
+      NotificationActions.showMessage('Chat', message.chat, NotificationConstants.INFO);
+    }
   }
 
   getPeerId() {
@@ -53,6 +67,10 @@ class GameStore extends BaseStore {
 
   isConnected() {
     return !!connection;
+  }
+
+  sendMessage(text) {
+    connection.send({ chat: text });
   }
 }
 
@@ -66,6 +84,9 @@ AppDispatcher.register((action) => {
       break;
     case GameConstants.JOIN_GAME:
       gameStoreInstance.joinGame(action.otherPeerId);
+      break;
+    case GameConstants.SEND_MESSAGE:
+      gameStoreInstance.sendMessage(action.text);
       break;
     default:
     // no op

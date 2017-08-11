@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import RouterHandler from './RouterHandler.react';
+import Toaster from './Toaster.react';
 
 // child pages
 import WelcomePage from './WelcomePage.react';
@@ -18,6 +19,7 @@ const App = () => (
         <Route path="/game" component={GamePage} />
         <Route path="/" component={WelcomePage} />
       </Switch>
+      <Toaster />
     </div>
   </Router>
 );

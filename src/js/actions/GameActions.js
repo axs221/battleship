@@ -19,6 +19,12 @@ const GameActions = {
       ships,
     });
   },
+  sendMessage(text) {
+    AppDispatcher.dispatch({
+      actionType: GameConstants.SEND_MESSAGE,
+      text,
+    });
+  },
 };
 
 export default GameActions;
