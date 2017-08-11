@@ -2,10 +2,10 @@ import AppDispatcher from '../dispatcher/AppDispatcher';
 import GameConstants from '../constants/GameConstants';
 
 const GameActions = {
-  push(url) {
+  connect(gameId) {
     AppDispatcher.dispatch({
       actionType: GameConstants.CONNECT,
-      url,
+      gameId,
     });
   },
 };
