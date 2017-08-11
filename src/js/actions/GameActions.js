@@ -2,10 +2,21 @@ import AppDispatcher from '../dispatcher/AppDispatcher';
 import GameConstants from '../constants/GameConstants';
 
 const GameActions = {
-  connect(gameId) {
+  createGame() {
     AppDispatcher.dispatch({
-      actionType: GameConstants.CONNECT,
-      gameId,
+      actionType: GameConstants.CREATE_GAME,
+    });
+  },
+  joinGame(otherPeerId) {
+    AppDispatcher.dispatch({
+      actionType: GameConstants.JOIN_GAME,
+      otherPeerId,
+    });
+  },
+  placeShips(ships) {
+    AppDispatcher.dispatch({
+      actionType: GameConstants.PLACE_SHIPS,
+      ships,
     });
   },
 };

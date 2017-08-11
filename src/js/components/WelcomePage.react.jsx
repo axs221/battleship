@@ -3,10 +3,8 @@ import RouterActions from '../actions/RouterActions';
 
 class WelcomePage extends React.Component {
   onStart = () => {
-    // TODO create unique game id
-
     // send the user to the newly created game
-    RouterActions.push('/game/1');
+    RouterActions.push('/wait');
   }
 
   render() {

@@ -1,5 +1,7 @@
 import keyMirror from 'keymirror';
 
 module.exports = keyMirror({
-  CONNECT: null,
+  CREATE_GAME: null,
+  JOIN_GAME: null,
+  PLACE_SHIPS: null,
 });

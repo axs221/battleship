@@ -4,6 +4,8 @@ import RouterHandler from './RouterHandler.react';
 
 // child pages
 import WelcomePage from './WelcomePage.react';
+import WaitingPage from './WaitingPage.react';
+import JoinPage from './JoinPage.react';
 import GamePage from './GamePage.react';
 
 const App = () => (
@@ -11,7 +13,9 @@ const App = () => (
     <div>
       <RouterHandler />
       <Switch>
-        <Route path="/game/:gameId" component={GamePage} />
+        <Route path="/wait" component={WaitingPage} />
+        <Route path="/join/:otherPeerId" component={JoinPage} />
+        <Route path="/game" component={GamePage} />
         <Route path="/" component={WelcomePage} />
       </Switch>
     </div>
