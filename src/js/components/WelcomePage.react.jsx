@@ -2,9 +2,10 @@ import React from 'react';
 import RouterActions from '../actions/RouterActions';
 
 class WelcomePage extends React.Component {
-  state = {};
-
   onStart = () => {
+    // TODO create unique game id
+
+    // send the user to the newly created game
     RouterActions.push('/game/1');
   }
 
@@ -12,7 +13,6 @@ class WelcomePage extends React.Component {
     return (
       <div>
         <h1>Battleship</h1>
-        <input type="text" placeholder="Friend's Phone Number" value={this.state.phoneNumber} onChange={e => this.setState({ phoneNumber: e.target.value })} />
         <button onClick={this.onStart}>Start</button>
       </div>
     );
