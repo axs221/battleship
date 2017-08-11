@@ -49,7 +49,8 @@
   "scripts": {
     "prebuild": "npm run clean",
     "build": "webpack",
-    "build-netlify": "webpack && cp src/_redirects dist/",
+    "netlify": "cp src/_redirects dist/",
+    "build-netlify": "npm run build && npm run netlify",
     "start": "webpack-dev-server",
     "clean": "rimraf dist && mkdir dist",
     "lint": "eslint src/js --ext .js --ext .jsx",
