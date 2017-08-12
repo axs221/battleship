@@ -20,7 +20,8 @@ class GamePage extends React.Component {
     this.forceUpdate();
   }
 
-  sendChat = () => {
+  sendChat = (e) => {
+    e.preventDefault();
     GameActions.sendMessage(this.state.chatMessage);
     this.setState({ chatMessage: '' });
   }
