@@ -10,19 +10,25 @@ let peerId = null;
 let connection = null;
 const gameState = {
   phase: 'setup',
+  myTurn: false,
   me: {
     setup: false,
     ships: [],
     attacks: [],
+    board: [],
   },
   enemy: {
     setup: false,
     attacks: [],
+    board: [],
   },
 };
 
 class GameStore extends BaseStore {
-  createGame() {
+  createGame = () => {
+    // set us as having the first turn
+    gameState.myTurn = true;
+
     // create our peer
     peer = new Peer({ key: 'p279t1ibr0diy66r' });
 
@@ -34,15 +40,20 @@ class GameStore extends BaseStore {
       // listen for when the peer connects to us
       peer.on('connection', (conn) => {
         connection = conn;
-        this.emitChange();
 
         // hook up our handler for messages
         connection.on('data', this.processMessage);
+
+        // start us in the setup phase
+        this.startSetupPhase();
+
+        // update the ui
+        this.emitChange();
       });
     });
   }
 
-  joinGame(otherPeerId) {
+  joinGame = (otherPeerId) => {
     // create our peer
     peer = new Peer({ key: 'p279t1ibr0diy66r' });
 
@@ -53,10 +64,14 @@ class GameStore extends BaseStore {
       // make a connection to the other player
       connection = peer.connect(otherPeerId);
       connection.on('open', () => {
-        this.emitChange();
-
         // hook up our handler for messages
         connection.on('data', this.processMessage);
+
+        // start us in the setup phase
+        this.startSetupPhase();
+
+        // update the ui
+        this.emitChange();
       });
     });
   }
@@ -69,11 +84,11 @@ class GameStore extends BaseStore {
     }
   }
 
-  processChatMessage(data) {
+  processChatMessage = (data) => {
     NotificationActions.showMessage('Chat', data.chat, NotificationConstants.INFO);
   }
 
-  processSetupFinished() {
+  processSetupFinished = () => {
     gameState.enemy.setup = true;
     this.checkIfSetupComplete();
     this.emitChange();
@@ -87,13 +102,13 @@ class GameStore extends BaseStore {
     return !!connection;
   }
 
-  placeShips(ships) {
+  placeShips = (ships) => {
     gameState.me.ships = ships;
     gameState.me.setup = true;
     this.checkIfSetupComplete();
   }
 
-  sendMessage(text) {
+  sendMessage = (text) => {
     connection.send({ type: 'chat', chat: text });
   }
 
@@ -101,13 +116,13 @@ class GameStore extends BaseStore {
     return gameState;
   }
 
-  checkIfSetupComplete() {
+  checkIfSetupComplete = () => {
     if (gameState.me.setup && gameState.enemy.setup) {
-      gameState.phase = 'play';
+      this.startPlayPhase();
     }
   }
 
-  clickTile(row, column) {
+  clickTile = (row, column) => {
     if (gameState.phase === 'setup') {
       this.handleClickSetup(row, column);
     } else {
@@ -115,17 +130,99 @@ class GameStore extends BaseStore {
     }
   }
 
-  handleClickSetup(row, column) {
+  handleClickSetup = (row, column) => {
     if (gameState.me.ships.length === 0) {
       gameState.me.ships.push({ start: { row, column } });
+      gameState.me.board[row][column] = { colour: '#888', clickable: false };
     } else {
       gameState.me.ships[0].end = { row, column };
+      gameState.me.board[row][column] = { colour: '#888', clickable: false };
       // TODO check if all boats are placed
       gameState.me.setup = true;
       connection.send({ type: 'setup-finished' });
       this.checkIfSetupComplete();
     }
     this.emitChange();
+  }
+
+  handleClickPlay = (row, column) => {
+    // update our board with the pending attack
+    gameState.enemy.board[row][column] = { colour: 'red', clickable: false };
+
+    // send the attack to the enemy
+    connection.send({ type: 'attack', row, column });
+
+    // update the ui
+    this.emitChange();
+  }
+
+  startSetupPhase = () => {
+    // set our phase
+    gameState.phase = 'setup';
+
+    // reset the player's setup flag
+    gameState.me.setup = false;
+    gameState.enemy.setup = false;
+
+    // reset our ships
+    gameState.me.ships = [];
+
+    // make our board blue and clickable and the enemy's board grey and unclickable
+    for (let row = 0; row < 8; row += 1) {
+      const myRow = [];
+      const enemyRow = [];
+      for (let column = 0; column < 8; column += 1) {
+        myRow.push({ colour: 'blue', clickable: true });
+        enemyRow.push({ colour: '#aaa', clickable: false });
+      }
+      gameState.me.board.push(myRow);
+      gameState.enemy.board.push(enemyRow);
+    }
+  }
+
+  startPlayPhase = () => {
+    // set our phase
+    gameState.phase = 'play';
+
+    // make the enemy's board clickable and our's unclickable
+    for (let row = 0; row < 8; row += 1) {
+      for (let column = 0; column < 8; column += 1) {
+        gameState.me.board[row][column].clickable = false;
+        gameState.enemy.board[row][column].clickable = true;
+      }
+    }
+
+    // set whose turn it is
+    if (gameState.myTurn) {
+      this.setMyTurn();
+    } else {
+      this.setEnemyTurn();
+    }
+  }
+
+  setMyTurn = () => {
+    gameState.myTurn = true;
+
+    // make the enemy's board clickable, except where attacks have already been made
+    for (let row = 0; row < 8; row += 1) {
+      for (let column = 0; column < 8; column += 1) {
+        const attackedAlready = gameState.me.attacks.find(attack => attack.row === row && attack.column === column);
+        if (!attackedAlready) {
+          gameState.enemy.board[row][column].clickable = true;
+        }
+      }
+    }
+  }
+
+  setEnemyTurn = () => {
+    gameState.myTurn = false;
+
+    // make the enemy's board unclickable
+    for (let row = 0; row < 8; row += 1) {
+      for (let column = 0; column < 8; column += 1) {
+        gameState.enemy.board[row][column].clickable = false;
+      }
+    }
   }
 }
 
