@@ -24,6 +24,15 @@ const gameState = {
   },
 };
 
+// colours
+const colourWater = 'blue';
+const colourFog = '#ccc';
+const colourBoat = '#888';
+const colourPossibleBoat = 'yellow';
+const colourAttackUnknown = 'green';
+const colourAttackHit = 'red';
+const colourAttackMiss = 'black';
+
 class GameStore extends BaseStore {
   createGame = () => {
     // set us as having the first turn
@@ -81,6 +90,8 @@ class GameStore extends BaseStore {
       this.processChatMessage(data);
     } else if (data.type === 'setup-finished') {
       this.processSetupFinished();
+    } else if (data.type === 'attack') {
+      this.processAttack(data);
     }
   }
 
@@ -91,6 +102,17 @@ class GameStore extends BaseStore {
   processSetupFinished = () => {
     gameState.enemy.setup = true;
     this.checkIfSetupComplete();
+    this.emitChange();
+  }
+
+  processAttack = (data) => {
+    // set the colour of the attacked square
+    gameState.me.board[data.row][data.column] = { colour: colourAttackUnknown };
+
+    // set it as our turn
+    this.setMyTurn();
+
+    // update the ui
     this.emitChange();
   }
 
@@ -147,10 +169,13 @@ class GameStore extends BaseStore {
 
   handleClickPlay = (row, column) => {
     // update our board with the pending attack
-    gameState.enemy.board[row][column] = { colour: 'red', clickable: false };
+    gameState.enemy.board[row][column] = { colour: colourAttackUnknown, clickable: false };
 
     // send the attack to the enemy
     connection.send({ type: 'attack', row, column });
+
+    // it's now the enemy's turn
+    this.setEnemyTurn();
 
     // update the ui
     this.emitChange();
@@ -172,8 +197,8 @@ class GameStore extends BaseStore {
       const myRow = [];
       const enemyRow = [];
       for (let column = 0; column < 8; column += 1) {
-        myRow.push({ colour: 'blue', clickable: true });
-        enemyRow.push({ colour: '#aaa', clickable: false });
+        myRow.push({ colour: colourWater, clickable: true });
+        enemyRow.push({ colour: colourFog, clickable: false });
       }
       gameState.me.board.push(myRow);
       gameState.enemy.board.push(enemyRow);

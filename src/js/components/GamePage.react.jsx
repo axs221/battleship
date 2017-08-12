@@ -28,17 +28,17 @@ class GamePage extends React.Component {
 
   render() {
     const gameState = GameStore.getGameState();
-    let banner = <h1>Battleship - {gameState.phase}</h1>;
+    let banner = gameState.phase;
     if (gameState.phase === 'play') {
       let turn = 'Your Turn';
       if (!gameState.myTurn) {
         turn = 'Enemy Turn';
       }
-      banner = <h1>Battleship - {turn}</h1>;
+      banner = turn;
     }
     return (
       <div>
-        <h1>{banner}</h1>;
+        <h1>Battleship - {banner}</h1>;
         <div className="row">
           <div className="col-md-6">
             <h3>You</h3>
