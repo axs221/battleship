@@ -65,7 +65,7 @@ class GameStore extends BaseStore {
     if (data.type === 'chat') {
       this.processChatMessage(data);
     } else if (data.type === 'setup-finished') {
-      this.processGameState(data);
+      this.processSetupFinished();
     }
   }
 
@@ -73,7 +73,7 @@ class GameStore extends BaseStore {
     NotificationActions.showMessage('Chat', data.chat, NotificationConstants.INFO);
   }
 
-  processSetupFinished(data) {
+  processSetupFinished() {
     gameState.enemy.setup = true;
     this.checkIfSetupComplete();
     this.emitChange();
@@ -120,6 +120,10 @@ class GameStore extends BaseStore {
       gameState.me.ships.push({ start: { row, column } });
     } else {
       gameState.me.ships[0].end = { row, column };
+      // TODO check if all boats are placed
+      gameState.me.setup = true;
+      connection.send({ type: 'setup-finished' });
+      this.checkIfSetupComplete();
     }
     this.emitChange();
   }

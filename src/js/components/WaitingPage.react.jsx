@@ -34,7 +34,7 @@ class WaitingPage extends React.Component {
     return (
       <div>
         <h1>Battleship</h1>
-        <p>Tell your friend to connect to http://battleship.netlify.com/join/{GameStore.getPeerId()}</p>
+        <p>Tell your friend to connect to http://battleship.mikecousins.com/join/{GameStore.getPeerId()}</p>
         <p>Waiting for friend...</p>
       </div>
     );
