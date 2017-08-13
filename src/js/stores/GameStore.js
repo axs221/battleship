@@ -92,6 +92,10 @@ class GameStore extends BaseStore {
       this.processSetupFinished();
     } else if (data.type === 'attack') {
       this.processAttack(data);
+    } else if (data.type === 'attack-result') {
+      this.processAttackResult(data);
+    } else if (data.type === 'loss') {
+      this.processLoss();
     }
   }
 
@@ -106,11 +110,59 @@ class GameStore extends BaseStore {
   }
 
   processAttack = (data) => {
-    // set the colour of the attacked square
-    gameState.me.board[data.row][data.column] = { colour: colourAttackUnknown };
+    // set the colour as a hit if it hit a ship
+    let hit = false;
+    gameState.me.ships.forEach((ship) => {
+      if ((ship.start.row === data.row && ship.start.column === data.column) || (ship.end.row === data.row && ship.end.column === data.column)) {
+        gameState.me.board[data.row][data.column].colour = colourAttackHit;
+        hit = true;
+      }
+    });
 
-    // set it as our turn
-    this.setMyTurn();
+    // if it wasn't a hit, set it as a miss
+    if (!hit) {
+      gameState.me.board[data.row][data.column].colour = colourAttackMiss;
+    }
+
+    // report the result back to the enemy
+    connection.send({ type: 'attack-result', row: data.row, column: data.column, hit });
+
+    // see if the game is over
+    let gameOver = true;
+    gameState.me.ships.forEach((ship) => {
+      if (gameState.me.board[ship.start.row][ship.start.column].colour !== colourAttackHit) {
+        gameOver = false;
+      } else if (gameState.me.board[ship.end.row][ship.end.column].colour !== colourAttackHit) {
+        gameOver = false;
+      }
+    });
+
+    if (gameOver) {
+      connection.send({ type: 'loss' });
+      this.startFinishPhase(false);
+    } else {
+      // set it as our turn
+      this.setMyTurn();
+    }
+
+    // update the ui
+    this.emitChange();
+  }
+
+  processAttackResult = (data) => {
+    // update the tile
+    if (data.hit) {
+      gameState.enemy.board[data.row][data.column].colour = colourAttackHit;
+    } else {
+      gameState.enemy.board[data.row][data.column].colour = colourAttackMiss;
+    }
+
+    // update the ui
+    this.emitChange();
+  }
+
+  processLoss = () => {
+    this.startFinishPhase(true);
 
     // update the ui
     this.emitChange();
@@ -269,6 +321,19 @@ class GameStore extends BaseStore {
       this.setMyTurn();
     } else {
       this.setEnemyTurn();
+    }
+  }
+
+  startFinishPhase = (winner) => {
+    gameState.phase = 'finished';
+    gameState.winner = winner;
+
+    // set both boards to unclickable
+    for (let row = 0; row < 8; row += 1) {
+      for (let column = 0; column < 8; column += 1) {
+        gameState.me.board[row][column].clickable = false;
+        gameState.enemy.board[row][column].clickable = false;
+      }
     }
   }
 

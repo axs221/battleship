@@ -35,6 +35,12 @@ class GamePage extends React.Component {
         turn = 'Enemy Turn';
       }
       banner = turn;
+    } else if (gameState.phase === 'finished') {
+      if (gameState.winner) {
+        banner = 'You won!';
+      } else {
+        banner = 'You lost!';
+      }
     }
     return (
       <div>
