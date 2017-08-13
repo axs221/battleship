@@ -154,16 +154,63 @@ class GameStore extends BaseStore {
 
   handleClickSetup = (row, column) => {
     if (gameState.me.ships.length === 0) {
+      // add this start position to our ships
       gameState.me.ships.push({ start: { row, column } });
-      gameState.me.board[row][column] = { colour: '#888', clickable: false };
+
+      // colour the tile and make it unclickable
+      gameState.me.board[row][column] = { colour: colourBoat };
+
+      // make the whole board unclickable
+      for (let i = 0; i < 8; i += 1) {
+        for (let j = 0; j < 8; j += 1) {
+          gameState.me.board[i][j].clickable = false;
+        }
+      }
+
+      // make the possible tiles coloured and clickable
+      const possibleSpots = [{ row: row - 1, column }, { row, column: column - 1 }, { row, column: column + 1 }, { row: row + 1, column }];
+      possibleSpots.forEach((spot) => {
+        // see if the spot is still on the board
+        // TODO also check to see if it conflicts with another boat
+        if (spot.row >= 0 && spot.row <= 7 && spot.column >= 0 && spot.column <= 7) {
+          gameState.me.board[spot.row][spot.column].colour = colourPossibleBoat;
+          gameState.me.board[spot.row][spot.column].clickable = true;
+        }
+      });
     } else {
+      // add this end position to our ships
       gameState.me.ships[0].end = { row, column };
-      gameState.me.board[row][column] = { colour: '#888', clickable: false };
+
+      // colour the tile and make it unclickable
+      gameState.me.board[row][column] = { colour: colourBoat, clickable: false };
+
+      // hide the other possible spots
+      for (let i = 0; i < 8; i += 1) {
+        for (let j = 0; j < 8; j += 1) {
+          if (gameState.me.board[i][j].colour === colourPossibleBoat) {
+            gameState.me.board[i][j].colour = colourWater;
+          }
+        }
+      }
+
       // TODO check if all boats are placed
       gameState.me.setup = true;
+
+      // make all the spots unclickable
+      for (let i = 0; i < 8; i += 1) {
+        for (let j = 0; j < 8; j += 1) {
+          gameState.me.board[i][j].clickable = false;
+        }
+      }
+
+      // tell the enemy we're done setup
       connection.send({ type: 'setup-finished' });
+
+      // see if we're both done setup
       this.checkIfSetupComplete();
     }
+
+    // update the ui
     this.emitChange();
   }
 
