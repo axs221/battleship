@@ -44,7 +44,7 @@ class GamePage extends React.Component {
     }
     return (
       <div>
-        <h1>Battleship - {banner}</h1>;
+        <h1>Battleship - {banner}</h1>
         <div className="row">
           <div className="col-md-6">
             <h3>You</h3>
