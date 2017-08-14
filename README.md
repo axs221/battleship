@@ -3,7 +3,7 @@
 # Battleship
 ## Written with React/Flux/WebRTC
 
-Demo: http://battlehsip.mikecousins.com
+Demo: http://battleship.mikecousins.com
 
 Builds/tests: [Travis](https://travis-ci.org/mikecousins/battleship)
 
