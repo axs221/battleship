@@ -30,9 +30,9 @@ class Tile extends React.Component {
     }
 
     if (clickable) {
-      return <p style={{ backgroundColor: colour, width: '50px', height: '50px', cursor: 'pointer' }} onClick={() => GameActions.clickTile(this.props.row, this.props.column)} />;
+      return <div className="tile" style={{ backgroundColor: colour, cursor: 'pointer' }} onClick={() => GameActions.clickTile(this.props.row, this.props.column)} role="button" tabIndex="-1" />;
     }
-    return <p style={{ backgroundColor: colour, width: '50px', height: '50px' }} />;
+    return <div className="tile" style={{ backgroundColor: colour }} />;
   }
 }
 

@@ -9,6 +9,9 @@ import WaitingPage from './WaitingPage.react';
 import JoinPage from './JoinPage.react';
 import GamePage from './GamePage.react';
 
+// styles for webpack
+import '../../css/battleship.css';
+
 const App = () => (
   <Router>
     <div>
