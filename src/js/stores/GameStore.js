@@ -113,10 +113,12 @@ class GameStore extends BaseStore {
     // set the colour as a hit if it hit a ship
     let hit = false;
     gameState.me.ships.forEach((ship) => {
-      if ((ship.start.row === data.row && ship.start.column === data.column) || (ship.end.row === data.row && ship.end.column === data.column)) {
-        gameState.me.board[data.row][data.column].colour = colourAttackHit;
-        hit = true;
-      }
+      ship.tiles.forEach((tile) => {
+        if (tile.row === data.row && tile.column === data.column) {
+          gameState.me.board[data.row][data.column].colour = colourAttackHit;
+          hit = true;
+        }
+      });
     });
 
     // if it wasn't a hit, set it as a miss
@@ -130,11 +132,11 @@ class GameStore extends BaseStore {
     // see if the game is over
     let gameOver = true;
     gameState.me.ships.forEach((ship) => {
-      if (gameState.me.board[ship.start.row][ship.start.column].colour !== colourAttackHit) {
-        gameOver = false;
-      } else if (gameState.me.board[ship.end.row][ship.end.column].colour !== colourAttackHit) {
-        gameOver = false;
-      }
+      ship.tiles.forEach((tile) => {
+        if (gameState.me.board[tile.row][tile.column].colour !== colourAttackHit) {
+          gameOver = false;
+        }
+      });
     });
 
     if (gameOver) {
@@ -207,7 +209,7 @@ class GameStore extends BaseStore {
   handleClickSetup = (row, column) => {
     if (gameState.me.ships.length === 0) {
       // add this start position to our ships
-      gameState.me.ships.push({ start: { row, column } });
+      gameState.me.ships.push({ tiles: [{ row, column }] });
 
       // colour the tile and make it unclickable
       gameState.me.board[row][column] = { colour: colourBoat };
@@ -220,7 +222,7 @@ class GameStore extends BaseStore {
       }
 
       // make the possible tiles coloured and clickable
-      const possibleSpots = [{ row: row - 1, column }, { row, column: column - 1 }, { row, column: column + 1 }, { row: row + 1, column }];
+      const possibleSpots = [{ row: row - 2, column }, { row, column: column - 2 }, { row, column: column + 2 }, { row: row + 2, column }];
       possibleSpots.forEach((spot) => {
         // see if the spot is still on the board
         // TODO also check to see if it conflicts with another boat
@@ -230,11 +232,40 @@ class GameStore extends BaseStore {
         }
       });
     } else {
-      // add this end position to our ships
-      gameState.me.ships[0].end = { row, column };
+      // add this end tile to our ship
+      gameState.me.ships[0].tiles.push({ row, column });
 
-      // colour the tile and make it unclickable
-      gameState.me.board[row][column] = { colour: colourBoat, clickable: false };
+      // add the intermediate tiles to the ship
+      const startRow = gameState.me.ships[0].tiles[0].row;
+      const startColumn = gameState.me.ships[0].tiles[0].column;
+      if (gameState.me.ships[0].tiles[0].row === row) {
+        // the boat is horizontal so add the intermediate values in
+        let lowerColumn = startColumn;
+        let higherColumn = column;
+        if (column < lowerColumn) {
+          lowerColumn = column;
+          higherColumn = startColumn;
+        }
+        for (let intermediateColumn = lowerColumn + 1; intermediateColumn < higherColumn; intermediateColumn += 1) {
+          gameState.me.ships[0].tiles.push({ row, column: intermediateColumn });
+        }
+      } else {
+        // the boat is vertical so add the intermediate values in
+        let lowerRow = startRow;
+        let higherRow = row;
+        if (row < lowerRow) {
+          lowerRow = row;
+          higherRow = startRow;
+        }
+        for (let intermediateRow = lowerRow + 1; intermediateRow < higherRow; intermediateRow += 1) {
+          gameState.me.ships[0].tiles.push({ row: intermediateRow, column });
+        }
+      }
+
+      // colour the tiles and make them unclickable
+      gameState.me.ships[0].tiles.forEach((tile) => {
+        gameState.me.board[tile.row][tile.column] = { colour: colourBoat, clickable: false };
+      });
 
       // hide the other possible spots
       for (let i = 0; i < 8; i += 1) {
