@@ -1,6 +1,9 @@
 [![Travis CI][travis-image]][travis-url]
 
-# battleship
+# Battleship
+## Written with React/Flux/WebRTC
 
-[travis-image]: https://img.shields.io/travis/mikecousins/react-toastr.svg?style=flat-square
-[travis-url]: https://travis-ci.org/mikecousins/react-toastr
+Demo: http://battlehsip.mikecousins.com
+
+[travis-image]: https://img.shields.io/travis/mikecousins/battleship.svg?style=flat-square
+[travis-url]: https://travis-ci.org/mikecousins/battleship
