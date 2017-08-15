@@ -1,6 +1,6 @@
 import GameStore from '../stores/GameStore';
 
-describe('A suite', () => {
+describe('A game store', () => {
   it('should initialize game state properly', () => {
     const gameState = GameStore.getGameState();
     expect(gameState.phase).toBe('setup');

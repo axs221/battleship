@@ -4,7 +4,6 @@ import Toaster from './Toaster.react';
 
 // child pages
 import WelcomePage from './WelcomePage.react';
-import WaitingPage from './WaitingPage.react';
 import JoinPage from './JoinPage.react';
 import GamePage from './GamePage.react';
 
@@ -15,7 +14,6 @@ const App = () => (
   <Router>
     <div>
       <Switch>
-        <Route path="/wait" component={WaitingPage} />
         <Route path="/join/:otherPeerId" component={JoinPage} />
         <Route path="/game" component={GamePage} />
         <Route path="/" component={WelcomePage} />
