@@ -24,6 +24,8 @@ const gameState = {
   },
 };
 
+const TOTAL_SHIPS = 5;
+
 // colours
 const colourWater = 'blue';
 const colourFog = '#ccc';
@@ -207,7 +209,13 @@ class GameStore extends BaseStore {
   }
 
   handleClickSetup = (row, column) => {
-    if (gameState.me.ships.length === 0) {
+    let newShip = true;
+    let shipNumber = gameState.me.ships.length;
+    if (shipNumber > 0 && gameState.me.ships[shipNumber - 1] && gameState.me.ships[shipNumber - 1].tiles && gameState.me.ships[shipNumber - 1].tiles.length === 1) {
+      newShip = false;
+      shipNumber -= 1;
+    }
+    if (newShip) {
       // add this start position to our ships
       gameState.me.ships.push({ tiles: [{ row, column }] });
 
@@ -225,20 +233,30 @@ class GameStore extends BaseStore {
       const possibleSpots = [{ row: row - 2, column }, { row, column: column - 2 }, { row, column: column + 2 }, { row: row + 2, column }];
       possibleSpots.forEach((spot) => {
         // see if the spot is still on the board
-        // TODO also check to see if it conflicts with another boat
         if (spot.row >= 0 && spot.row <= 7 && spot.column >= 0 && spot.column <= 7) {
-          gameState.me.board[spot.row][spot.column].colour = colourPossibleBoat;
-          gameState.me.board[spot.row][spot.column].clickable = true;
+          // see if the spot conflicts with another boat
+          let conflict = false;
+          gameState.me.ships.forEach((ship) => {
+            ship.tiles.forEach((tile) => {
+              if (tile.row === spot.row && tile.column === spot.column) {
+                conflict = true;
+              }
+            });
+          });
+          if (!conflict) {
+            gameState.me.board[spot.row][spot.column].colour = colourPossibleBoat;
+            gameState.me.board[spot.row][spot.column].clickable = true;
+          }
         }
       });
     } else {
       // add this end tile to our ship
-      gameState.me.ships[0].tiles.push({ row, column });
+      gameState.me.ships[shipNumber].tiles.push({ row, column });
 
       // add the intermediate tiles to the ship
-      const startRow = gameState.me.ships[0].tiles[0].row;
-      const startColumn = gameState.me.ships[0].tiles[0].column;
-      if (gameState.me.ships[0].tiles[0].row === row) {
+      const startRow = gameState.me.ships[shipNumber].tiles[0].row;
+      const startColumn = gameState.me.ships[shipNumber].tiles[0].column;
+      if (gameState.me.ships[shipNumber].tiles[0].row === row) {
         // the boat is horizontal so add the intermediate values in
         let lowerColumn = startColumn;
         let higherColumn = column;
@@ -247,7 +265,7 @@ class GameStore extends BaseStore {
           higherColumn = startColumn;
         }
         for (let intermediateColumn = lowerColumn + 1; intermediateColumn < higherColumn; intermediateColumn += 1) {
-          gameState.me.ships[0].tiles.push({ row, column: intermediateColumn });
+          gameState.me.ships[shipNumber].tiles.push({ row, column: intermediateColumn });
         }
       } else {
         // the boat is vertical so add the intermediate values in
@@ -258,12 +276,12 @@ class GameStore extends BaseStore {
           higherRow = startRow;
         }
         for (let intermediateRow = lowerRow + 1; intermediateRow < higherRow; intermediateRow += 1) {
-          gameState.me.ships[0].tiles.push({ row: intermediateRow, column });
+          gameState.me.ships[shipNumber].tiles.push({ row: intermediateRow, column });
         }
       }
 
       // colour the tiles and make them unclickable
-      gameState.me.ships[0].tiles.forEach((tile) => {
+      gameState.me.ships[shipNumber].tiles.forEach((tile) => {
         gameState.me.board[tile.row][tile.column] = { colour: colourBoat, clickable: false };
       });
 
@@ -276,21 +294,32 @@ class GameStore extends BaseStore {
         }
       }
 
-      // TODO check if all boats are placed
-      gameState.me.setup = true;
-
-      // make all the spots unclickable
+      // make all the water spots clickable
       for (let i = 0; i < 8; i += 1) {
         for (let j = 0; j < 8; j += 1) {
-          gameState.me.board[i][j].clickable = false;
+          if (gameState.me.board[i][j].colour === colourWater) {
+            gameState.me.board[i][j].clickable = true;
+          }
         }
       }
 
-      // tell the enemy we're done setup
-      connection.send({ type: 'setup-finished' });
+      // check if all boats are placed
+      if (gameState.me.ships.length === TOTAL_SHIPS) {
+        gameState.me.setup = true;
 
-      // see if we're both done setup
-      this.checkIfSetupComplete();
+        // make all the spots unclickable
+        for (let i = 0; i < 8; i += 1) {
+          for (let j = 0; j < 8; j += 1) {
+            gameState.me.board[i][j].clickable = false;
+          }
+        }
+
+        // tell the enemy we're done setup
+        connection.send({ type: 'setup-finished' });
+
+        // see if we're both done setup
+        this.checkIfSetupComplete();
+      }
     }
 
     // update the ui
