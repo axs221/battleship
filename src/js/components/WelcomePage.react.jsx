@@ -24,17 +24,21 @@ class WelcomePage extends React.Component {
     const peerId = GameStore.getPeerId();
     if (!peerId) {
       return (
-        <div className="container-fluid welcome">
-          <h1>Battleship</h1>
-          <p>Creating game...</p>
+        <div className="container welcome">
+          <div className="jumbotron">
+            <h1 className="display-3">Battleship</h1>
+            <p>Creating game...</p>
+          </div>
         </div>
       );
     }
     return (
-      <div className="container-fluid welcome">
-        <h1>Battleship</h1>
-        <p>Tell your friend to connect to http://battleship.mikecousins.com/join/{GameStore.getPeerId()}</p>
-        <p>Waiting for friend...</p>
+      <div className="container welcome">
+        <div className="jumbotron">
+          <h1 className="display-3">Battleship</h1>
+          <p>Tell your friend to connect to http://battleship.mikecousins.com/join/{GameStore.getPeerId()}</p>
+          <p>Waiting for friend...</p>
+        </div>
       </div>
     );
   }
