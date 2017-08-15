@@ -43,7 +43,7 @@ class GamePage extends React.Component {
       }
     }
     return (
-      <div>
+      <div className="container-fluid">
         <h1>Battleship - {banner}</h1>
         <div className="row">
           <div className="col-md-6">

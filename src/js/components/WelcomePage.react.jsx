@@ -1,20 +1,13 @@
 import React from 'react';
-import RouterActions from '../actions/RouterActions';
+import { Link } from 'react-router-dom';
 
-class WelcomePage extends React.Component {
-  onStart = () => {
-    // send the user to the newly created game
-    RouterActions.push('/wait');
-  }
-
-  render() {
-    return (
-      <div className="welcome">
-        <h1>Battleship</h1>
-        <button onClick={this.onStart}>Start</button>
-      </div>
-    );
-  }
-}
+const WelcomePage = () => (
+  <div className="welcome">
+    <div className="container-fluid">
+      <h1>Battleship</h1>
+      <Link to="/wait" className="btn btn-primary">Start</Link>
+    </div>
+  </div>
+);
 
 export default WelcomePage;

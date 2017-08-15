@@ -1,6 +1,5 @@
 import React from 'react';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
-import RouterHandler from './RouterHandler.react';
 import Toaster from './Toaster.react';
 
 // child pages
@@ -15,7 +14,6 @@ import '../../css/battleship.css';
 const App = () => (
   <Router>
     <div>
-      <RouterHandler />
       <Switch>
         <Route path="/wait" component={WaitingPage} />
         <Route path="/join/:otherPeerId" component={JoinPage} />

@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import RouterActions from '../actions/RouterActions';
+import { Redirect } from 'react-router-dom';
 import GameStore from '../stores/GameStore';
 import GameActions from '../actions/GameActions';
 
@@ -19,14 +19,15 @@ class JoinPage extends React.Component {
   }
 
   onChange = () => {
-    if (GameStore.isConnected()) {
-      RouterActions.push('/game');
-    }
+    this.forceUpdate();
   }
 
   render() {
+    if (GameStore.isConnected()) {
+      return <Redirect to="/game" />;
+    }
     return (
-      <div>
+      <div className="container-fluid">
         <h1>Battleship</h1>
         <p>Waiting for connnection...</p>
       </div>
