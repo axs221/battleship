@@ -9,7 +9,7 @@ class WelcomePage extends React.Component {
 
   render() {
     return (
-      <div>
+      <div className="welcome">
         <h1>Battleship</h1>
         <button onClick={this.onStart}>Start</button>
       </div>

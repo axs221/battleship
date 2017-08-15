@@ -11,8 +11,8 @@
     "keymirror": "0.1.1",
     "peerjs": "^0.3.14",
     "prop-types": "15.5.10",
-    "react": "16.0.0-beta.5",
-    "react-dom": "16.0.0-beta.5",
+    "react": "15.6.1",
+    "react-dom": "15.6.1",
     "react-hot-loader": "3.0.0-beta.7",
     "react-router": "4.1.2",
     "react-router-dom": "4.1.2",
@@ -30,6 +30,7 @@
     "babel-preset-react": "6.24.1",
     "babel-preset-stage-3": "6.24.1",
     "css-loader": "0.28.4",
+    "enzyme": "2.9.1",
     "eslint": "4.3.0",
     "eslint-config-airbnb": "15.1.0",
     "eslint-plugin-import": "2.7.0",
@@ -37,7 +38,11 @@
     "eslint-plugin-react": "7.1.0",
     "file-loader": "0.11.2",
     "html-webpack-plugin": "2.30.1",
+    "jest": "20.0.4",
+    "jest-cli": "20.0.4",
     "progress-bar-webpack-plugin": "1.10.0",
+    "react-addons-test-utils": "15.3.0",
+    "react-test-renderer": "15.6.1",
     "rimraf": "2.6.1",
     "style-loader": "0.18.2",
     "stylelint": "8.0.0",
@@ -53,7 +58,8 @@
     "clean": "rimraf dist && mkdir dist",
     "lint": "eslint src/js --ext .js --ext .jsx",
     "stylelint": "stylelint **/*.css",
-    "lint-all": "npm run lint && npm run stylelint"
+    "lint-all": "npm run lint && npm run stylelint",
+    "test": "jest"
   },
   "author": "Mike Cousins"
 }
