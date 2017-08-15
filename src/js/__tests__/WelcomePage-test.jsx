@@ -5,7 +5,7 @@ import WelcomePage from '../components/WelcomePage.react';
 
 describe('A welcome page', () => {
   it('should render without throwing an error', () => {
-    expect(shallow(<WelcomePage />).contains(<h1>Battleship</h1>)).toBe(true);
+    expect(shallow(<WelcomePage />).contains(<h1 className="display-3">Battleship</h1>)).toBe(true);
   });
 
   it('should be selectable by class "welcome"', () => {
