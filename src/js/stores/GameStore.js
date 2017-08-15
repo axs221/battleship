@@ -240,7 +240,7 @@ class GameStore extends BaseStore {
           const newTiles = this.calculateIntermediateSquares(
             gameState.me.ships[shipNumber].tiles[0].row,
             gameState.me.ships[shipNumber].tiles[0].column,
-            spot.row, spot.column)
+            spot.row, spot.column);
           newTiles.push(spot);
 
           gameState.me.ships.forEach((existingShip) => {
