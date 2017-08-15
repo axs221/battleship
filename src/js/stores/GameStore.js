@@ -236,11 +236,20 @@ class GameStore extends BaseStore {
         if (spot.row >= 0 && spot.row <= 7 && spot.column >= 0 && spot.column <= 7) {
           // see if the spot conflicts with another boat
           let conflict = false;
-          gameState.me.ships.forEach((ship) => {
-            ship.tiles.forEach((tile) => {
-              if (tile.row === spot.row && tile.column === spot.column) {
-                conflict = true;
-              }
+
+          const newTiles = this.calculateIntermediateSquares(
+            gameState.me.ships[shipNumber].tiles[0].row,
+            gameState.me.ships[shipNumber].tiles[0].column,
+            spot.row, spot.column)
+          newTiles.push(spot);
+
+          gameState.me.ships.forEach((existingShip) => {
+            existingShip.tiles.forEach((existingTile) => {
+              newTiles.forEach((newTile) => {
+                if (newTile.row === existingTile.row && newTile.column === existingTile.column) {
+                  conflict = true;
+                }
+              });
             });
           });
           if (!conflict) {
@@ -250,35 +259,12 @@ class GameStore extends BaseStore {
         }
       });
     } else {
+      // add the intermediate tiles to our ship
+      const intermediateTiles = this.calculateIntermediateSquares(gameState.me.ships[shipNumber].tiles[0].row, gameState.me.ships[shipNumber].tiles[0].column, row, column);
+      intermediateTiles.forEach(tile => gameState.me.ships[shipNumber].tiles.push(tile));
+
       // add this end tile to our ship
       gameState.me.ships[shipNumber].tiles.push({ row, column });
-
-      // add the intermediate tiles to the ship
-      const startRow = gameState.me.ships[shipNumber].tiles[0].row;
-      const startColumn = gameState.me.ships[shipNumber].tiles[0].column;
-      if (gameState.me.ships[shipNumber].tiles[0].row === row) {
-        // the boat is horizontal so add the intermediate values in
-        let lowerColumn = startColumn;
-        let higherColumn = column;
-        if (column < lowerColumn) {
-          lowerColumn = column;
-          higherColumn = startColumn;
-        }
-        for (let intermediateColumn = lowerColumn + 1; intermediateColumn < higherColumn; intermediateColumn += 1) {
-          gameState.me.ships[shipNumber].tiles.push({ row, column: intermediateColumn });
-        }
-      } else {
-        // the boat is vertical so add the intermediate values in
-        let lowerRow = startRow;
-        let higherRow = row;
-        if (row < lowerRow) {
-          lowerRow = row;
-          higherRow = startRow;
-        }
-        for (let intermediateRow = lowerRow + 1; intermediateRow < higherRow; intermediateRow += 1) {
-          gameState.me.ships[shipNumber].tiles.push({ row: intermediateRow, column });
-        }
-      }
 
       // colour the tiles and make them unclickable
       gameState.me.ships[shipNumber].tiles.forEach((tile) => {
@@ -420,6 +406,34 @@ class GameStore extends BaseStore {
         gameState.enemy.board[row][column].clickable = false;
       }
     }
+  }
+
+  calculateIntermediateSquares = (startRow, startColumn, endRow, endColumn) => {
+    const intermediateTiles = [];
+    if (startRow === endRow) {
+      // the boat is horizontal so add the intermediate values in
+      let lowerColumn = startColumn;
+      let higherColumn = endColumn;
+      if (endColumn < lowerColumn) {
+        lowerColumn = endColumn;
+        higherColumn = startColumn;
+      }
+      for (let intermediateColumn = lowerColumn + 1; intermediateColumn < higherColumn; intermediateColumn += 1) {
+        intermediateTiles.push({ row: endRow, column: intermediateColumn });
+      }
+    } else {
+      // the boat is vertical so add the intermediate values in
+      let lowerRow = startRow;
+      let higherRow = endRow;
+      if (endRow < lowerRow) {
+        lowerRow = endRow;
+        higherRow = startRow;
+      }
+      for (let intermediateRow = lowerRow + 1; intermediateRow < higherRow; intermediateRow += 1) {
+        intermediateTiles.push({ row: intermediateRow, column: endColumn });
+      }
+    }
+    return intermediateTiles;
   }
 }
 
