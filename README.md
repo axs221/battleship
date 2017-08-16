@@ -8,7 +8,7 @@ Demo: http://battleship.mikecousins.com
 Builds/tests: [Travis](https://travis-ci.org/mikecousins/battleship)
 
 Highlights:
-* React 16
+* React 15
 * Flux
 * React Router
 * Automatically deployed on [Netlify](http://www.netlify.com)
